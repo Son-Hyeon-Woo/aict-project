@@ -15,7 +15,7 @@ public class EmailRiskDTO {
     private String riskLevel;
     private String riskDetail;
     private LocalDateTime detectionDate;
-    private String detectionResult;
+    // private String detectionResult;
 
     // Getters and Setters
 }

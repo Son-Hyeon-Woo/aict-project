@@ -32,7 +32,7 @@ public class EmailRisk {
   @Column(name = "detection_date")
   private LocalDateTime detectionDate;
 
-  @Column(name = "detection_result")
-  private String detectionResult;
+  // @Column(name = "detection_result")
+  // private String detectionResult;
 
 }

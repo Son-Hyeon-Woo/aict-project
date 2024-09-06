@@ -1,9 +1,12 @@
 package org.kt.backend.service;
 
 import jakarta.transaction.Transactional;
+import java.util.Optional;
 import org.kt.backend.dto.EmailDTO;
+import org.kt.backend.dto.EmailRiskDTO;
 import org.kt.backend.entity.Email;
 import org.kt.backend.entity.EmailRecipient;
+import org.kt.backend.entity.EmailRisk;
 import org.kt.backend.entity.EmailAttachment;
 import org.kt.backend.repository.EmailRepository;
 import org.modelmapper.ModelMapper;
@@ -64,6 +67,23 @@ public class EmailService {
     }
 
     
+    emailRepository.save(email);
+  }
+
+  /**
+   * process_status가 '진행전'인 이메일을 하나 가져옵니다.
+   * @param processStatus 이메일의 처리 상태
+   * @return Optional로 감싼 이메일 엔티티
+   */
+  public Optional<Email> findEmailByProcessStatus(String processStatus) {
+    return emailRepository.findFirstByProcessStatusOrderByReceivedDateAsc(processStatus);
+  }
+
+  @Transactional
+  public void updateEmailWithRisk(Email email, EmailRiskDTO riskDTO) {
+    EmailRisk emailRisk = modelMapper.map(riskDTO, EmailRisk.class);
+    email.setRiskLevel(emailRisk);
+    email.setProcessStatus("완료");
     emailRepository.save(email);
   }
 
