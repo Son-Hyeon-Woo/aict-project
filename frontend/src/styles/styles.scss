@@ -1,0 +1,12 @@
+// Write your overrides
+@media (min-width: 1280px) {
+  .custom-col-width-3-5 {
+    flex: 0 0 29.166667% !important;
+    max-width: 29.166667% !important;
+  }
+}
+
+.v-table {
+  color: rgba(var(--v-theme-grey-800),0.9) !important;
+
+}

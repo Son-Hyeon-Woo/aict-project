@@ -1,0 +1,21 @@
+{
+    "semi": false,
+    "useTabs": false,
+    "endOfLine": "auto",
+    "singleQuote": true,
+    "trailingComma": "all",
+    "singleAttributePerLine": true,
+    "arrowParens": "avoid",
+    "printWidth": 130,
+    "bracketSameLine": false,
+    "htmlWhitespaceSensitivity": "strict",
+    "vueIndentScriptAndStyle": false,
+    "overrides": [
+        {
+            "files": "*.vue",
+            "options": {
+                "singleLineHtmlElementContent": false
+            }
+        }
+    ]
+}
