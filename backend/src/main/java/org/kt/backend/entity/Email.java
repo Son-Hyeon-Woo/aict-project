@@ -18,6 +18,7 @@ import lombok.Data;
 @Entity
 @Table(name = "email")
 public class Email {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "email_no")
@@ -53,8 +54,4 @@ public class Email {
   @OneToOne(mappedBy = "email", cascade = CascadeType.ALL, optional = true)
   private EmailRisk riskLevel;
 
-  public void addAttachment(EmailAttachment attachment) {
-    attachments.add(attachment);
-    attachment.setEmail(this);
-  }
 }

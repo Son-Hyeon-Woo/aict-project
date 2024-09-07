@@ -12,24 +12,30 @@ import java.time.LocalDateTime;
 
 import org.kt.backend.dto.EmailDTO;
 import org.kt.backend.dto.EmailRecipientDTO;
+import org.kt.backend.entity.Email;
+import org.kt.backend.entity.EmailAttachment;
+import org.kt.backend.entity.EmailRecipient;
 import org.kt.backend.dto.EmailAttachmentDTO;
 import org.kt.backend.dto.EmailContentDTO;
-
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.kt.backend.repository.EmailRepository;
 
 @Slf4j
 @Service
-public class MockEmailReceiverService {
-  private final EmailService emailService;
+public class EmailGenerater {
+  private final EmailRepository emailRepository;
+  private final ModelMapper modelMapper;
   private final Random random = new Random();
 
   // NOTE - 생성자가 하나인 경우 @Autowired 생략 가능
-  public MockEmailReceiverService(EmailService emailService) {
-    this.emailService = emailService;
+  public EmailGenerater(EmailRepository emailRepository, ModelMapper modelMapper) {
+    this.emailRepository = emailRepository;
+    this.modelMapper = modelMapper;
   }
 
   @Scheduled(fixedRate = 30000) // * 일정 주기마다 실행
@@ -37,31 +43,56 @@ public class MockEmailReceiverService {
     int emailCount = random.nextInt(5) + 1; // 1~5개의 이메일 생성
     for (int i = 0; i < emailCount; i++) {
       EmailDTO emailDTO = createMockEmail();
-      emailService.saveEmail(emailDTO);
+      Email email = modelMapper.map(emailDTO, Email.class);
+      // EmailRecipient의 email 필드를 설정
+      if (email.getRecipients() != null) {
+        for (EmailRecipient recipient : email.getRecipients()) {
+          recipient.setEmail(email);
+        }
+      }
+
+      // EmailContent의 email 필드를 설정
+      if (email.getContent() != null) {
+        email.getContent().setEmail(email);
+      }
+
+      // EmailAttachment의 email 필드를 설정
+      if (email.getAttachments() != null) {
+        for (EmailAttachment attachment : email.getAttachments()) {
+          attachment.setEmail(email);
+        }
+      }
+
+      // EmailRisk의 email 필드를 설정
+      if (email.getRiskLevel() != null) {
+        email.getRiskLevel().setEmail(email);
+      }
+
+      emailRepository.save(email);
+      // emailService.saveEmail(emailDTO);
     }
     log.info("모의 이메일 생성 완료: " + emailCount);
   }
 
   private EmailDTO createMockEmail() {
-    EmailDTO emailDTO = new EmailDTO();
-    emailDTO.setMessageNo(UUID.randomUUID().toString());
-    emailDTO.setSubject(generateRandomSubject());
-    emailDTO.setReceivedDate(LocalDateTime.now());
-    emailDTO.setProcessStatus("진행전");
-    emailDTO.setProcessResult("처리전");
-    emailDTO.setSender(createRandomSender());
-    emailDTO.setRecipients(createRandomRecipients());
-    EmailContentDTO content = new EmailContentDTO();
-    content.setContent(generateRandomEmailContent());
-    emailDTO.setContent(content);
-    emailDTO.setRiskLevel(null);
-    emailDTO.setAttachments(createRandomAttachments());
+    EmailDTO emailDTO = EmailDTO.builder()
+        .messageNo(UUID.randomUUID().toString())
+        .subject(generateRandomSubject())
+        .receivedDate(LocalDateTime.now())
+        .processStatus("진행전")
+        .processResult("처리전")
+        .sender(createRandomSender())
+        .recipients(createRandomRecipients())
+        .content(EmailContentDTO.builder()
+            .content(generateRandomEmailContent()).build())
+        .riskLevel(null)
+        .attachments(createRandomAttachments()).build();
     return emailDTO;
   }
 
   // 👉 - 랜덤 발신자 생성
   private String createRandomSender() {
-    String[] domains = {"example.com", "mail.com", "test.org", "sample.net"};
+    String[] domains = { "example.com", "mail.com", "test.org", "sample.net" };
     String username = generateRandomUsername();
     String domain = domains[random.nextInt(domains.length)];
     return username + "@" + domain;
@@ -95,14 +126,14 @@ public class MockEmailReceiverService {
 
   // 👉 - 랜덤 수신자 타입 생성
   private String getRandomRecipientType() {
-    String[] types = {"TO", "CC", "BCC"};
+    String[] types = { "TO", "CC", "BCC" };
     return types[random.nextInt(types.length)];
   }
 
   // 👉 - 랜덤 이메일 제목 생성
   private String generateRandomSubject() {
-    String[] subjects = {"회의 일정 안내", "프로젝트 진행 상황 보고", "휴가 신청 승인 요청", "신규 서비스 출시 안내", "보안 업데이트 공지",
-        "월간 실적 보고서", "고객 피드백 요약", "팀 빌딩 이벤트 안내", "시스템 점검 예정 공지"};
+    String[] subjects = { "회의 일정 안내", "프로젝트 진행 상황 보고", "휴가 신청 승인 요청", "신규 서비스 출시 안내", "보안 업데이트 공지",
+        "월간 실적 보고서", "고객 피드백 요약", "팀 빌딩 이벤트 안내", "시스템 점검 예정 공지" };
     return subjects[random.nextInt(subjects.length)];
   }
 
@@ -122,9 +153,9 @@ public class MockEmailReceiverService {
 
   // 👉 - 랜덤 문장 생성
   private String generateRandomSentence() {
-    String[] starts = {"안녕하세요,", "알려드립니다.", "확인 부탁드립니다.", "주의해 주시기 바랍니다."};
-    String[] middles = {"프로젝트가 순조롭게 진행되고 있습니다.", "회의 일정이 변경되었습니다.", "새로운 정책이 시행될 예정입니다."};
-    String[] ends = {"감사합니다.", "문의사항이 있으면 연락주세요.", "좋은 하루 보내세요."};
+    String[] starts = { "안녕하세요,", "알려드립니다.", "확인 부탁드립니다.", "주의해 주시기 바랍니다." };
+    String[] middles = { "프로젝트가 순조롭게 진행되고 있습니다.", "회의 일정이 변경되었습니다.", "새로운 정책이 시행될 예정입니다." };
+    String[] ends = { "감사합니다.", "문의사항이 있으면 연락주세요.", "좋은 하루 보내세요." };
 
     return starts[random.nextInt(starts.length)] + " " + middles[random.nextInt(middles.length)]
         + " " + ends[random.nextInt(ends.length)];
@@ -148,8 +179,8 @@ public class MockEmailReceiverService {
 
   // 👉 - 랜덤 파일 이름 생성
   private String generateRandomFileName() {
-    String[] fileTypes = {".pdf", ".docx", ".xlsx", ".jpg", ".png", ".zip"};
-    String[] fileNames = {"report", "document", "image", "data", "presentation"};
+    String[] fileTypes = { ".pdf", ".docx", ".xlsx", ".jpg", ".png", ".zip" };
+    String[] fileNames = { "report", "document", "image", "data", "presentation" };
     return fileNames[random.nextInt(fileNames.length)] + "_" + random.nextInt(1000)
         + fileTypes[random.nextInt(fileTypes.length)];
   }

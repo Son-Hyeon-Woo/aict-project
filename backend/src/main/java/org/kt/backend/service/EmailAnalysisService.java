@@ -2,10 +2,12 @@ package org.kt.backend.service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.kt.backend.dto.EmailAnalysisRequestDTO;
 import org.kt.backend.dto.EmailAnalysisResponseDTO;
 import org.kt.backend.dto.EmailRiskDTO;
 import org.kt.backend.entity.Email;
+import org.kt.backend.entity.EmailAttachment;
 import org.kt.backend.entity.EmailRisk;
 import org.kt.backend.repository.EmailRepository;
 import org.kt.backend.repository.EmailRiskRepository;
@@ -14,7 +16,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -42,12 +43,14 @@ public class EmailAnalysisService {
 
   @Transactional
   public void analyzeEmail(Email email) {
+    // 👉 - 이메일 분석 요청 DTO 생성
     EmailAnalysisRequestDTO requestDTO =
         new EmailAnalysisRequestDTO(email.getSender(), email.getContent().getContent(),
             email.getAttachments().isEmpty() ? null
-                : email.getAttachments().stream().map(attachment -> attachment.getFilePath())
+                : email.getAttachments().stream().map(EmailAttachment::getFilePath)
                     .collect(java.util.stream.Collectors.toList()));
 
+    // 👉 - 이메일 분석 API 호출 및 응답 수신
     log.info("메일 분석 API로 요청..");
 
     EmailAnalysisResponseDTO responseDTO =
@@ -61,9 +64,9 @@ public class EmailAnalysisService {
       // * 값에 따라서 RiskLevel 다르게 적용
       int riskScore = responseDTO.getRiskScore();
 
-      if (riskScore >= 1 && riskScore <= 30) {
+      if (riskScore >= 1 && riskScore <= 20) {
         riskDTO.setRiskLevel("안전");
-      } else if (riskScore > 30 && riskScore <= 70) {
+      } else if (riskScore > 20 && riskScore <= 70) {
         riskDTO.setRiskLevel("보통");
       } else if (riskScore > 70 && riskScore <= 85) {
         riskDTO.setRiskLevel("위험");
@@ -73,14 +76,12 @@ public class EmailAnalysisService {
 
       riskDTO.setRiskDetail(responseDTO.getRiskType());
       riskDTO.setDetectionDate(LocalDateTime.now());
-      // riskDTO.setDetectionResult("분석 완료");
 
       EmailRisk emailRisk = new EmailRisk();
       emailRisk.setEmail(email);
       emailRisk.setRiskLevel(riskDTO.getRiskLevel());
       emailRisk.setRiskDetail(riskDTO.getRiskDetail());
       emailRisk.setDetectionDate(riskDTO.getDetectionDate());
-      // emailRisk.setDetectionResult(riskDTO.getDetectionResult());
 
       emailRiskRepository.save(emailRisk);
 

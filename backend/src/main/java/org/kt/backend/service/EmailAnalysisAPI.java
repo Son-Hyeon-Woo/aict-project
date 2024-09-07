@@ -8,10 +8,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
-public class MockEmailAnalysisService {
-    private static final Logger logger = LoggerFactory.getLogger(MockEmailAnalysisService.class);
+public class EmailAnalysisAPI {
+    private static final Logger logger = LoggerFactory.getLogger(EmailAnalysisAPI.class);
     private static final int RISK_THRESHOLD = 70;
-    private static final String[] RISK_TYPES = {"피싱", "멀웨어", "랜섬웨어", "스팸"};
+    private static final String[] RISK_TYPES = { "피싱", "멀웨어", "랜섬웨어", "스팸" };
     private static final String NO_RISK_TYPE = "유형없음";
     private static final int MIN_SLEEP_TIME = 2000;
     private static final int MAX_SLEEP_TIME = 4000;

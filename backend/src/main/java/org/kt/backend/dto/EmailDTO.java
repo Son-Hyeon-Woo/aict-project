@@ -20,7 +20,7 @@ public class EmailDTO {
     private String processStatus;
     private String processResult;
     private List<EmailRecipientDTO> recipients;
-    private EmailContentDTO content; 
+    private EmailContentDTO content;
     private List<EmailAttachmentDTO> attachments;
     private EmailRiskDTO riskLevel;
 
