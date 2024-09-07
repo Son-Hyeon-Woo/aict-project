@@ -13,4 +13,8 @@ public class EmailContentDTO {
     private Integer emailNo;
     private String content;
 
+    public EmailContentDTO(String content) {
+        this.content = content;
+    }
+
 }

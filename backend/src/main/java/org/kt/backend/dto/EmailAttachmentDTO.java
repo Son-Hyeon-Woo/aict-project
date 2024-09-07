@@ -14,4 +14,10 @@ public class EmailAttachmentDTO {
     private String fileName;
     private String filePath;
     private Integer fileSize;
+
+    public EmailAttachmentDTO(String fileName, String filePath, Integer fileSize) {
+        this.fileName = fileName;
+        this.filePath = filePath;
+        this.fileSize = fileSize;
+    }
 }

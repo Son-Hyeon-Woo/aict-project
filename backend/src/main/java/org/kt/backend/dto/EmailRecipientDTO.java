@@ -13,4 +13,9 @@ public class EmailRecipientDTO {
     private Integer recipientNo;
     private String recipientEmail;
     private String recipientType;
+
+    public EmailRecipientDTO(String recipientEmail, String recipientType) {
+        this.recipientEmail = recipientEmail;
+        this.recipientType = recipientType;
+    }
 }

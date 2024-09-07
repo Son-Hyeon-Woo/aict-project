@@ -11,11 +11,12 @@ import org.kt.backend.repository.EmailRepository;
 import org.kt.backend.repository.EmailRiskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class EmailAnalysisService {
 
@@ -31,7 +32,7 @@ public class EmailAnalysisService {
   @Scheduled(fixedRate = 10000) // 10초마다 실행
   @Transactional
   public void analyzePendingEmails() {
-    System.out.println("진행전 상태인 이메일 가져오기..");
+    log.info("진행전 상태인 이메일 가져오기..");
     Optional<Email> optionalEmail =
         emailRepository.findFirstByProcessStatusOrderByReceivedDateAsc("진행전");
     if (optionalEmail.isPresent()) {
@@ -39,7 +40,6 @@ public class EmailAnalysisService {
     }
   }
 
-  @Async("taskExecutor")
   @Transactional
   public void analyzeEmail(Email email) {
     EmailAnalysisRequestDTO requestDTO =
@@ -48,7 +48,7 @@ public class EmailAnalysisService {
                 : email.getAttachments().stream().map(attachment -> attachment.getFilePath())
                     .collect(java.util.stream.Collectors.toList()));
 
-    System.out.println("메일 분석 API로 요청..");
+    log.info("메일 분석 API로 요청..");
 
     EmailAnalysisResponseDTO responseDTO =
         webClient.post().uri("http://localhost:8080/mock-api/email-analysis").bodyValue(requestDTO)
@@ -94,7 +94,7 @@ public class EmailAnalysisService {
       }
 
       emailRepository.save(email);
-      System.out.println("이메일 분석 완료");
+      log.info("이메일 분석 완료");
     }
   }
 
