@@ -1,6 +1,7 @@
 package org.kt.backend.entity;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Version;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,6 +19,9 @@ import lombok.Data;
 @Entity
 @Table(name = "email")
 public class Email {
+
+  @Version
+  private Long version;
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

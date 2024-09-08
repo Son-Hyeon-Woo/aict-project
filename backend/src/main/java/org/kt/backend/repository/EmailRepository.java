@@ -11,19 +11,23 @@ import java.time.LocalDateTime;
 
 @Repository
 public interface EmailRepository extends JpaRepository<Email, Integer> {
-    Optional<Email> findFirstByProcessStatusOrderByReceivedDateAsc(String processStatus);
+        Optional<Email> findFirstByProcessStatusOrderByReceivedDateAsc(String processStatus);
 
-    List<Email> findByProcessStatusNot(String processStatus);
+        List<Email> findByProcessStatusNot(String processStatus);
 
-    @Query("SELECT COUNT(e) FROM Email e WHERE e.receivedDate >= :startOfDay AND e.receivedDate < :endOfDay")
-    long countTodayReceivedEmails(@Param("startOfDay") LocalDateTime startOfDay,
-            @Param("endOfDay") LocalDateTime endOfDay);
+        @Query("SELECT COUNT(e) FROM Email e WHERE e.receivedDate >= :startOfDay AND e.receivedDate < :endOfDay")
+        long countTodayReceivedEmails(@Param("startOfDay") LocalDateTime startOfDay,
+                        @Param("endOfDay") LocalDateTime endOfDay);
 
-    @Query("SELECT COUNT(e) FROM Email e JOIN e.riskLevel r WHERE e.receivedDate >= :startOfDay AND e.receivedDate < :endOfDay AND r.riskLevel != '안전'")
-    long countTodayHighRiskEmails(@Param("startOfDay") LocalDateTime startOfDay,
-            @Param("endOfDay") LocalDateTime endOfDay);
+        @Query("SELECT COUNT(e) FROM Email e JOIN e.riskLevel r WHERE e.receivedDate >= :startOfDay AND e.receivedDate < :endOfDay AND r.riskLevel != '안전'")
+        long countTodayHighRiskEmails(@Param("startOfDay") LocalDateTime startOfDay,
+                        @Param("endOfDay") LocalDateTime endOfDay);
 
-    @Query("SELECT COUNT(e) FROM Email e JOIN e.riskLevel r WHERE e.receivedDate >= :startOfDay AND e.receivedDate < :endOfDay AND r.riskLevel != '안전' AND e.processResult = '차단'")
-    long countTodayBlockedHighRiskEmails(@Param("startOfDay") LocalDateTime startOfDay,
-            @Param("endOfDay") LocalDateTime endOfDay);
+        @Query("SELECT COUNT(e) FROM Email e JOIN e.riskLevel r WHERE e.receivedDate >= :startOfDay AND e.receivedDate < :endOfDay AND r.riskLevel != '안전' AND e.processResult = '차단'")
+        long countTodayBlockedHighRiskEmails(@Param("startOfDay") LocalDateTime startOfDay,
+                        @Param("endOfDay") LocalDateTime endOfDay);
+
+        // 👉 - 주어진 기간 동안의 이메일 개수를 반환하는 쿼리
+        @Query("SELECT COUNT(e) FROM Email e WHERE e.receivedDate BETWEEN :start AND :end")
+        long countEmailsBetween(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 }

@@ -3,8 +3,13 @@ package org.kt.backend.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.List;
+
 import org.kt.backend.repository.EmailRepository;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +43,45 @@ public class DashboardService {
 
     response.put("status", "OK");
     response.put("message", "금일 이메일 탐지 정보 조회 성공");
+    response.put("data", data);
+
+    return response;
+  }
+
+  public Map<String, Object> getHourlyEmailStats() {
+    LocalDateTime now = LocalDateTime.now();
+
+    LocalDateTime recentFullHour = now.withMinute(0).withSecond(0).withNano(0);
+    List<String> categories = IntStream.rangeClosed(0, 9)
+        .mapToObj(i -> recentFullHour.minusHours(9 - i).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:00")))
+        .collect(Collectors.toList());
+
+    List<Long> todayData = categories.stream()
+        .map(category -> {
+          LocalDateTime start = LocalDateTime.parse(category, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:00"));
+          LocalDateTime end = start.plusHours(1);
+          return emailRepository.countEmailsBetween(start, end);
+        })
+        .collect(Collectors.toList());
+
+    List<Long> yesterdayData = categories.stream()
+        .map(category -> {
+          LocalDateTime start = LocalDateTime.parse(category, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:00"))
+              .minusDays(1);
+          LocalDateTime end = start.plusHours(1);
+          return emailRepository.countEmailsBetween(start, end);
+        })
+        .collect(Collectors.toList());
+
+    Map<String, Object> data = new HashMap<>();
+    data.put("categories", categories);
+    data.put("series", List.of(
+        Map.of("name", "금일", "data", todayData),
+        Map.of("name", "전일", "data", yesterdayData)));
+
+    Map<String, Object> response = new HashMap<>();
+    response.put("status", "OK");
+    response.put("message", "최근 10시간 이메일 탐지 정보 조회 성공");
     response.put("data", data);
 
     return response;

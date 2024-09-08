@@ -30,12 +30,11 @@ public class EmailAnalysisService {
   @Autowired
   private WebClient webClient;
 
-  @Scheduled(fixedRate = 10000) // 10초마다 실행
+  @Scheduled(fixedRate = 1000) // 10초마다 실행
   @Transactional
   public void analyzePendingEmails() {
     log.info("진행전 상태인 이메일 가져오기..");
-    Optional<Email> optionalEmail =
-        emailRepository.findFirstByProcessStatusOrderByReceivedDateAsc("진행전");
+    Optional<Email> optionalEmail = emailRepository.findFirstByProcessStatusOrderByReceivedDateAsc("진행전");
     if (optionalEmail.isPresent()) {
       analyzeEmail(optionalEmail.get());
     }
@@ -44,18 +43,17 @@ public class EmailAnalysisService {
   @Transactional
   public void analyzeEmail(Email email) {
     // 👉 - 이메일 분석 요청 DTO 생성
-    EmailAnalysisRequestDTO requestDTO =
-        new EmailAnalysisRequestDTO(email.getSender(), email.getContent().getContent(),
-            email.getAttachments().isEmpty() ? null
-                : email.getAttachments().stream().map(EmailAttachment::getFilePath)
-                    .collect(java.util.stream.Collectors.toList()));
+    EmailAnalysisRequestDTO requestDTO = new EmailAnalysisRequestDTO(email.getSender(), email.getContent().getContent(),
+        email.getAttachments().isEmpty() ? null
+            : email.getAttachments().stream().map(EmailAttachment::getFilePath)
+                .collect(java.util.stream.Collectors.toList()));
 
     // 👉 - 이메일 분석 API 호출 및 응답 수신
     log.info("메일 분석 API로 요청..");
 
-    EmailAnalysisResponseDTO responseDTO =
-        webClient.post().uri("http://localhost:8080/mock-api/email-analysis").bodyValue(requestDTO)
-            .retrieve().bodyToMono(EmailAnalysisResponseDTO.class).block();
+    EmailAnalysisResponseDTO responseDTO = webClient.post().uri("http://localhost:8080/mock-api/email-analysis")
+        .bodyValue(requestDTO)
+        .retrieve().bodyToMono(EmailAnalysisResponseDTO.class).block();
 
     if (responseDTO != null) {
       EmailRiskDTO riskDTO = new EmailRiskDTO();
@@ -98,6 +96,5 @@ public class EmailAnalysisService {
       log.info("이메일 분석 완료");
     }
   }
-
 
 }
