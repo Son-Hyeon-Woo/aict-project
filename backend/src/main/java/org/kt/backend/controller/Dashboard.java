@@ -1,18 +1,13 @@
 package org.kt.backend.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-import org.kt.backend.dto.BlockedEmailDTO;
 import org.kt.backend.service.DashboardService;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import org.kt.backend.entity.Email;
 
 @CrossOrigin()
 @RestController
@@ -47,5 +42,17 @@ public class Dashboard {
     @Operation(summary = "최근 10개 차단된 이메일", description = "최근 10개 차단된 이메일을 가져옵니다.")
     public Map<String, Object> getTop10BlockedEmails() {
         return dashboardService.getTop10BlockedEmails();
+    }
+
+    @GetMapping("/count-by-risk-detail-last-7-days")
+    @Operation(summary = "최근 7일간 이메일 탐지 건수", description = "최근 7일간 이메일 탐지건수를 가져옵니다.")
+    public Map<String, Object> getEmailsCountByRiskDetailLast7Days() {
+        return dashboardService.getEmailsCountByRiskDetailLast7Days();
+    }
+
+    @GetMapping("/recent-emails")
+    @Operation(summary = "최근 이메일", description = "최근 이메일을 가져옵니다.")
+    public Map<String, Object> getRecentEmailsWithoutDetectionResult() {
+        return dashboardService.getRecentEmailsWithoutDetectionResult();
     }
 }

@@ -140,4 +140,62 @@ public class DashboardService {
 
     return response;
   }
+
+  public Map<String, Object> getEmailsCountByRiskDetailLast7Days() {
+    LocalDate currentDate = LocalDate.now();
+    Map<String, Long> emailCountMap = new HashMap<>();
+
+    for (int i = 0; i < 7; i++) {
+      LocalDateTime startOfDay = currentDate.atStartOfDay();
+      LocalDateTime endOfDay = currentDate.atTime(LocalTime.MAX);
+
+      long totalEmails = emailRepository.countEmailsByRiskDetailNotNoneOnDate(startOfDay, endOfDay);
+      emailCountMap.put(currentDate.toString(), totalEmails);
+
+      currentDate = currentDate.minusDays(1);
+    }
+
+    LocalDateTime lastUpdateTime = LocalDateTime.now();
+    Map<String, Object> data = new HashMap<>();
+    data.put("emailCountByRiskDetail", emailCountMap);
+    data.put("lastUpdateTime", lastUpdateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+
+    Map<String, Object> response = new HashMap<>();
+    response.put("status", "OK");
+    response.put("message", "최근 7일간 이메일 유형별 갯수 조회 성공");
+    response.put("data", data);
+
+    return response;
+  }
+
+  public Map<String, Object> getRecentEmailsWithoutDetectionResult() {
+    List<Object[]> recentEmails = emailRepository.findRecentEmailsWithoutDetectionResult();
+    List<Map<String, Object>> emailData = recentEmails.stream().map(email -> {
+      Map<String, Object> emailInfo = new HashMap<>();
+      emailInfo.put("emailNo", email[0]);
+      emailInfo.put("sender", email[1]);
+      emailInfo.put("subject", email[2]);
+      emailInfo.put("receivedDate", email[3]);
+      emailInfo.put("processStatus", email[4]);
+      emailInfo.put("processResult", email[5]);
+      emailInfo.put("riskLevel", email[6]);
+      emailInfo.put("riskDetail", email[7]);
+      emailInfo.put("detectionDate", email[8]);
+      emailInfo.put("recipients", email[9]);
+      emailInfo.put("attachments", email[10]);
+      return emailInfo;
+    }).collect(Collectors.toList());
+
+    LocalDateTime lastUpdateTime = LocalDateTime.now();
+    Map<String, Object> data = new HashMap<>();
+    data.put("emails", emailData);
+    data.put("lastUpdateTime", lastUpdateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+
+    Map<String, Object> response = new HashMap<>();
+    response.put("status", "OK");
+    response.put("message", "이메일 목록 조회 성공");
+    response.put("data", data);
+
+    return response;
+  }
 }
