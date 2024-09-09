@@ -6,6 +6,8 @@ import org.kt.backend.dto.EmailAnalysisResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import java.util.List;
+import java.util.ArrayList;
 
 @Service
 public class EmailAnalysisAPI {
@@ -23,6 +25,19 @@ public class EmailAnalysisAPI {
         String riskType = determineRiskType(random, riskScore);
         simulateAnalysisDelay(random);
         return new EmailAnalysisResponseDTO(riskType, riskScore);
+    }
+
+    public List<EmailAnalysisResponseDTO> analyzeEmails(List<EmailAnalysisRequestDTO> requestDTOs) {
+        Random random = new Random();
+        List<EmailAnalysisResponseDTO> responses = new ArrayList<>();
+        for (EmailAnalysisRequestDTO requestDTO : requestDTOs) {
+            int riskScore = generateRiskScore(random);
+            String riskType = determineRiskType(random, riskScore);
+
+            responses.add(new EmailAnalysisResponseDTO(riskType, riskScore));
+        }
+        simulateAnalysisDelay(random);
+        return responses;
     }
 
     // 👉 - 랜덤 위험 점수 생성
@@ -48,4 +63,5 @@ public class EmailAnalysisAPI {
             logger.error("AI 분석 시뮬레이션 중 인터럽트 발생: {}", e.getMessage());
         }
     }
+
 }

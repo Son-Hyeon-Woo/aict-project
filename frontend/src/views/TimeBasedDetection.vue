@@ -15,11 +15,14 @@
 
 <script setup>
 import { useAxiosStore } from '@/stores/axios'
-import { onBeforeMount } from 'vue'
+import { useUpdateTimeStore } from '@/stores/useUpdateTimeStore'
 import VueApexCharts from 'vue3-apexcharts'
 
 const axiosStore = useAxiosStore()
 const axios = axiosStore.getAxiosInstance()
+let intervalId = null
+
+const updateTimeStore = useUpdateTimeStore()
 
 const series = ref([
   {
@@ -59,7 +62,7 @@ const chartOptions = ref({
 
 const fetchTimeBasedDetection = async () => {
   try {
-    const response = await axios.get('http://localhost:8080/api/hourly-detected-emails')
+    const response = await axios.get('hourly-detected-emails')
 
     series.value[0].data = response.data.data.series[0].data
     series.value[1].data = response.data.data.series[1].data
@@ -77,14 +80,19 @@ const fetchTimeBasedDetection = async () => {
       },
     }
 
-    console.log(response)
+    updateTimeStore.setTimeBasedDetectionUpdateTime(response.data.data.lastUpdateTime)
   } catch (error) {
     console.error('Error fetching data:', error)
   }
 }
 
-onBeforeMount(() => {
+onMounted(() => {
   fetchTimeBasedDetection()
+  intervalId = setInterval(fetchTimeBasedDetection, 7000) // 10초마다 폴링
+})
+
+onUnmounted(() => {
+  if (intervalId) clearInterval(intervalId) // 컴포넌트 언마운트 시 폴링 중지
 })
 </script>
 

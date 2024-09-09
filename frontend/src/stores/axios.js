@@ -11,7 +11,7 @@ export const useAxiosStore = defineStore('axiosStore', {
     initializeAxios() {
       // Axios 인스턴스 생성
       this.axiosInstance = axios.create({
-        baseURL: '',
+        baseURL: 'http://localhost:8080/api',
         headers: {
           'Content-Type': 'application/json',
           Authorization: 'Bearer yourTokenHere',

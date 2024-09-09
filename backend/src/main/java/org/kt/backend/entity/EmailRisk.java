@@ -26,7 +26,7 @@ public class EmailRisk {
   @Column(name = "risk_level")
   private String riskLevel;
 
-  @Column(name = "risk_detail", columnDefinition = "TEXT")
+  @Column(name = "risk_detail")
   private String riskDetail;
 
   @Column(name = "detection_date")

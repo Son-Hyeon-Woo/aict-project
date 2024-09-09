@@ -11,7 +11,10 @@ import java.util.stream.IntStream;
 import java.util.List;
 
 import org.kt.backend.repository.EmailRepository;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+
+import org.kt.backend.entity.Email;
 
 // NOTE - 이메일 관련 비즈니스 로직을 처리하는 서비스 클래스입니다.
 @Service
@@ -32,12 +35,14 @@ public class DashboardService {
     long highRiskEmails = emailRepository.countTodayHighRiskEmails(startOfDay, endOfDay);
     long blockedHighRiskEmails = emailRepository.countTodayBlockedHighRiskEmails(startOfDay,
         endOfDay);
+    LocalDateTime lastUpdateTime = LocalDateTime.now();
 
-    Map<String, Long> data = new HashMap<>();
+    Map<String, Object> data = new HashMap<>();
 
     data.put("totalEmails", totalEmails);
     data.put("highRiskEmails", highRiskEmails);
     data.put("blockedHighRiskEmails", blockedHighRiskEmails);
+    data.put("lastUpdateTime", lastUpdateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
     Map<String, Object> response = new HashMap<>();
 
@@ -72,16 +77,65 @@ public class DashboardService {
           return emailRepository.countEmailsBetween(start, end);
         })
         .collect(Collectors.toList());
+    LocalDateTime lastUpdateTime = LocalDateTime.now();
 
     Map<String, Object> data = new HashMap<>();
     data.put("categories", categories);
     data.put("series", List.of(
         Map.of("name", "금일", "data", todayData),
         Map.of("name", "전일", "data", yesterdayData)));
-
+    data.put("lastUpdateTime", lastUpdateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
     Map<String, Object> response = new HashMap<>();
     response.put("status", "OK");
     response.put("message", "최근 10시간 이메일 탐지 정보 조회 성공");
+    response.put("data", data);
+
+    return response;
+  }
+
+  public Map<String, Object> getEmailsCountByRiskDetail() {
+    LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+    LocalDateTime endOfDay = LocalDate.now().atTime(LocalTime.MAX);
+    List<Object[]> results = emailRepository.countEmailsByRiskDetail(startOfDay, endOfDay);
+    System.out.println(results);
+    Map<String, Long> countEmailsByRiskDetail = new HashMap<>();
+    for (Object[] result : results) {
+      countEmailsByRiskDetail.put((String) result[0], (Long) result[1]);
+    }
+
+    LocalDateTime lastUpdateTime = LocalDateTime.now();
+    Map<String, Object> data = new HashMap<>();
+    data.put("emailCountByRiskDetail", countEmailsByRiskDetail);
+    data.put("lastUpdateTime", lastUpdateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+
+    Map<String, Object> response = new HashMap<>();
+    response.put("status", "OK");
+    response.put("message", "금일 이메일 유형별 갯수 조회 성공");
+    response.put("data", data);
+
+    return response;
+  }
+
+  public Map<String, Object> getTop10BlockedEmails() {
+    List<Email> emails = emailRepository.findTop10BlockedEmailsOrderByDetectionDate(PageRequest.of(0, 10));
+    List<Map<String, Object>> emailData = emails.stream().map(email -> {
+      Map<String, Object> emailInfo = new HashMap<>();
+      emailInfo.put("title", email.getSubject());
+      emailInfo.put("riskLevel", email.getRiskLevel().getRiskLevel());
+      emailInfo.put("riskDetail", email.getRiskLevel().getRiskDetail());
+      emailInfo.put("detectionDate",
+          email.getRiskLevel().getDetectionDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+      return emailInfo;
+    }).collect(Collectors.toList());
+
+    LocalDateTime lastUpdateTime = LocalDateTime.now();
+    Map<String, Object> data = new HashMap<>();
+    data.put("emails", emailData);
+    data.put("lastUpdateTime", lastUpdateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+
+    Map<String, Object> response = new HashMap<>();
+    response.put("status", "OK");
+    response.put("message", "차단된 이메일 목록 조회 성공");
     response.put("data", data);
 
     return response;

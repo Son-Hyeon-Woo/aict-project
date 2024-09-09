@@ -49,6 +49,7 @@ export default defineConfig({
     },
   },
   build: {
+    outDir: '../backend/src/main/resources/static',
     chunkSizeWarningLimit: 5000, //* 청크 파일 크기 경고 한계 설정 (기본값: 500KB)
     //? 큰 JS 를 작은 JS 여러개로 분리
     //? 로딩시간 단축 및 NW 트래픽 줄어드는 효과 (필요한 JS를 그때 로딩해서 사용함)
@@ -56,7 +57,6 @@ export default defineConfig({
     //? .js 파일 만들때 해쉬 재생성
     rollupOptions: {
       output: {
-        // 파일 이름 패턴 설정
         chunkFileNames: 'assets/[name]-[hash].js',
         entryFileNames: 'assets/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash][extname]',

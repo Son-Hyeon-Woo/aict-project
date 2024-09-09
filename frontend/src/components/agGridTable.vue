@@ -5,8 +5,8 @@
       class="pt-0"
     >
       <AgGridVue
-        :auto-size-strategy="{ type: 'fitCellContents' }"
-        :auto-size-padding="10"
+        :auto-size-strategy="{ type: 'fitGridWidth' }"
+        :auto-size-padding="5"
         :row-data="rowData"
         :column-defs="colDefs"
         :header-height="headerHeight"
@@ -41,7 +41,7 @@ const props = defineProps({
   },
   headerHeight: {
     type: Number,
-    default: 45,
+    default: 35,
   },
   paginationPageSize: {
     type: Number,
@@ -73,7 +73,7 @@ const props = defineProps({
 const emits = defineEmits(['gridReady'])
 
 const onGridReady = params => {
-  params.api.sizeColumnsToFit()
+  params.api.autoSizeAllColumns()
   params.api.showLoadingOverlay()
   emits('gridReady', params)
 }

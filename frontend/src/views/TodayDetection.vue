@@ -32,13 +32,16 @@
 </template>
 
 <script setup>
-import { useAxiosStore } from '@/stores/axios'
-
 import TripleArrows from '@/components/TripleArrow.vue'
+import { useAxiosStore } from '@/stores/axios'
+import { useUpdateTimeStore } from '@/stores/useUpdateTimeStore'
 import VueApexCharts from 'vue3-apexcharts'
 
 const axiosStore = useAxiosStore()
 const axios = axiosStore.getAxiosInstance()
+
+const updateTimeStore = useUpdateTimeStore()
+
 let intervalId = null
 
 const todayStats = ref({
@@ -80,6 +83,9 @@ const chartOptions1 = ref({
             fontWeight: 600,
             fontFamily: 'Pretendard Variable',
             fontSize: '1.2rem',
+            formatter: function (val) {
+              return todayStats.value.detected
+            },
           },
           value: {
             show: true,
@@ -138,6 +144,9 @@ const chartOptions2 = ref({
             fontWeight: 600,
             fontFamily: 'Pretendard Variable',
             fontSize: '1rem',
+            formatter: function (val) {
+              return todayStats.value.blocked
+            },
           },
           value: {
             show: true,
@@ -166,13 +175,13 @@ const chartOptions2 = ref({
 
 const fetchTodayDetection = async () => {
   try {
-    const response = await axios.get('http://localhost:8080/api/today-detected-emails')
+    const response = await axios.get('today-detected-emails')
 
     // {totalEmails: 60, blockedHighRiskEmails: 4, highRiskEmails: 12}
     todayStats.value.total = response.data.data.totalEmails
     todayStats.value.detected = response.data.data.highRiskEmails
     todayStats.value.blocked = response.data.data.blockedHighRiskEmails
-    console.log(todayStats.value)
+    updateTimeStore.setTodayDetectionUpdateTime(response.data.data.lastUpdateTime)
   } catch (error) {
     console.error('Error fetching data:', error)
   }
@@ -180,7 +189,7 @@ const fetchTodayDetection = async () => {
 
 onMounted(() => {
   fetchTodayDetection()
-  intervalId = setInterval(fetchTodayDetection, 30000) // 1분마다 폴링
+  intervalId = setInterval(fetchTodayDetection, 5000) // 10초마다 폴링
 })
 
 onUnmounted(() => {
