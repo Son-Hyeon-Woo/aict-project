@@ -15,6 +15,11 @@ const router = createRouter({
           component: () => import('../pages/dashboard.vue'),
           name: 'dashboard',
         },
+        {
+          path: 'mail-list',
+          component: () => import('../pages/mail-list.vue'),
+          name: 'mail-list',
+        },
       ],
     },
     {

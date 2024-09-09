@@ -75,7 +75,6 @@ const chartOptions = ref({
 async function getEmailsCountByRiskLevel() {
   const response = await axios.get('count-by-risk-detail')
 
-  // {멀웨어: 143, 랜섬웨어: 144, 스팸: 126, 피싱: 154}
   series.value[0].data = Object.values(response.data.data.emailCountByRiskDetail)
 
   chartOptions.value = {
@@ -86,7 +85,6 @@ async function getEmailsCountByRiskLevel() {
     },
   }
 
-  console.log(response.data.data)
   updateTimeStore.setDetectionCategoryUpdateTime(response.data.data.lastUpdateTime)
 }
 

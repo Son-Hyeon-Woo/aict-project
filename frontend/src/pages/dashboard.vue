@@ -5,6 +5,7 @@ import DetectionCategoryChart from '@/views/DetectionCategoryChart.vue'
 import RiskEmailList from '@/views/RiskEmailList.vue'
 import TimeBasedDetection from '@/views/TimeBasedDetection.vue'
 import TodayDetection from '@/views/TodayDetection.vue'
+import WeeklyDetection from '@/views/WeeklyDetection.vue'
 
 const axiosStore = useAxiosStore()
 
@@ -88,6 +89,25 @@ onMounted(() => {})
         </div>
         <div class="d-flex align-center justify-center flex-grow-1">
           <RiskEmailList />
+        </div>
+      </VSheet>
+    </VCol>
+    <VCol
+      sm="12"
+      md="5"
+      class="d-flex flex-column"
+    >
+      <VSheet class="pa-4 elevation-12 rounded flex-grow-1 d-flex flex-column">
+        <div class="d-flex align-center justify-center">
+          <VLabel style="font-size: 1.2rem; font-weight: 700; color: #00000095">최근 7일 탐지 추이</VLabel>
+        </div>
+        <div class="d-flex align-center justify-center flex-grow-1">
+          <WeeklyDetection />
+        </div>
+        <div class="d-flex align-center justify-center">
+          <VLabel style="font-size: 0.9rem; font-weight: 700; color: #00000075">
+            마지막 업데이트 시간: {{ updateTimeStore.weeklyDetection }}
+          </VLabel>
         </div>
       </VSheet>
     </VCol>

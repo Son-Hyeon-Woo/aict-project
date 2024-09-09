@@ -13,25 +13,25 @@ const colDefs = ref([
   {
     headerName: '제목',
     field: 'title',
-    headerClass: 'font-size-9 font-weight-bold',
+    headerClass: 'font-size-9 font-weight-bold bg-lightred',
     cellStyle: { 'text-align': 'center' },
   },
   {
     headerName: '위험도',
     field: 'riskLevel',
-    headerClass: 'font-size-9 font-weight-bold',
+    headerClass: 'font-size-9 font-weight-bold bg-lightred',
     cellStyle: { 'text-align': 'center' },
   },
   {
     headerName: '위험유형',
     field: 'riskDetail',
-    headerClass: 'font-size-9 font-weight-bold',
+    headerClass: 'font-size-9 font-weight-bold bg-lightred',
     cellStyle: { 'text-align': 'center' },
   },
   {
     headerName: '차단일자',
     field: 'detectionDate',
-    headerClass: 'font-size-9 font-weight-bold',
+    headerClass: 'font-size-9 font-weight-bold bg-lightred',
     cellStyle: { 'text-align': 'center' },
   },
 ])
