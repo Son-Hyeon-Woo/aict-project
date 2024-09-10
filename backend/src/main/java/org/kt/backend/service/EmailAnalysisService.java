@@ -1,7 +1,6 @@
 package org.kt.backend.service;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 
 import org.kt.backend.dto.EmailAnalysisRequestDTO;
@@ -46,11 +45,11 @@ public class EmailAnalysisService {
   // }
   // }
 
-  @Scheduled(fixedRate = 10000) // 10초마다 실행
+  @Scheduled(fixedRate = 2000) // 10초마다 실행
   @Transactional
   public void analyzePendingEmails() {
     log.info("진행전 상태인 이메일들 가져오기..");
-    Pageable pageable = PageRequest.of(0, 10);
+    Pageable pageable = PageRequest.of(0, 2);
     List<Email> pendingEmails = emailRepository.findByProcessStatusOrderByReceivedDateAsc("진행전", pageable);
     if (!pendingEmails.isEmpty()) {
       analyzeEmails(pendingEmails);

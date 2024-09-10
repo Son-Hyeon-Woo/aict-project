@@ -48,7 +48,7 @@ const fetchData = async () => {
 
 onMounted(() => {
   fetchData()
-  intervalId = setInterval(fetchData, 10000) // 10초마다 폴링
+  intervalId = setInterval(fetchData, 2000) // 10초마다 폴링
 })
 
 onUnmounted(() => {
@@ -71,7 +71,3 @@ onUnmounted(() => {
     </VCol>
   </VRow>
 </template>
-
-<style>
-/* pass */
-</style>

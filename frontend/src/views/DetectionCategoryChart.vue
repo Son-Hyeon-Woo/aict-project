@@ -90,7 +90,7 @@ async function getEmailsCountByRiskLevel() {
 
 onMounted(() => {
   getEmailsCountByRiskLevel()
-  intervalId = setInterval(getEmailsCountByRiskLevel, 10000) // 10초마다 폴링
+  intervalId = setInterval(getEmailsCountByRiskLevel, 3000) // 10초마다 폴링
 })
 
 onUnmounted(() => {

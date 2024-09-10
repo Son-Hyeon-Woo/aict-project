@@ -88,7 +88,7 @@ const fetchTimeBasedDetection = async () => {
 
 onMounted(() => {
   fetchTimeBasedDetection()
-  intervalId = setInterval(fetchTimeBasedDetection, 7000) // 10초마다 폴링
+  intervalId = setInterval(fetchTimeBasedDetection, 3000) // 10초마다 폴링
 })
 
 onUnmounted(() => {

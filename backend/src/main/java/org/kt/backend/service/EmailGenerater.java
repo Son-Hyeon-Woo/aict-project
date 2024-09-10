@@ -38,9 +38,9 @@ public class EmailGenerater {
     this.modelMapper = modelMapper;
   }
 
-  @Scheduled(fixedRate = 30000) // * 일정 주기마다 실행
+  @Scheduled(fixedRate = 5000) // * 일정 주기마다 실행
   public void receiveMockEmails() {
-    int emailCount = random.nextInt(5) + 1; // 1~5개의 이메일 생성
+    int emailCount = random.nextInt(5) + 1; // 1~3개의 이메일 생성
     for (int i = 0; i < emailCount; i++) {
       EmailDTO emailDTO = createMockEmail();
       Email email = modelMapper.map(emailDTO, Email.class);

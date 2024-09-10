@@ -92,7 +92,7 @@ const fetchWeeklyDetection = async () => {
 
 onMounted(() => {
   fetchWeeklyDetection()
-  intervalId = setInterval(fetchWeeklyDetection, 5000) // 10초마다 폴링
+  intervalId = setInterval(fetchWeeklyDetection, 4000) // 10초마다 폴링
 })
 
 onUnmounted(() => {

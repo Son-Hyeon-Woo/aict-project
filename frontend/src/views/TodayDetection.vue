@@ -189,7 +189,7 @@ const fetchTodayDetection = async () => {
 
 onMounted(() => {
   fetchTodayDetection()
-  intervalId = setInterval(fetchTodayDetection, 5000) // 10초마다 폴링
+  intervalId = setInterval(fetchTodayDetection, 2000) // 10초마다 폴링
 })
 
 onUnmounted(() => {

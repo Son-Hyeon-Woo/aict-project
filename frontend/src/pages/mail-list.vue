@@ -9,11 +9,15 @@ import AgGridTable from '@/components/agGridTable.vue'
 
 const rowData = ref([])
 
+const dialog = ref(false)
+
 const colDefs = ref([
   {
     headerName: '메일번호',
     field: 'emailNo',
     headerClass: 'font-size-9 font-weight-bold bg-skyblue',
+    enableCellChangeFlash: true,
+
     cellStyle: { 'text-align': 'center' },
   },
   {
@@ -97,7 +101,13 @@ onUnmounted(() => {
 
 const router = useRouter()
 
-const handleCellDoubleClick = event => {}
+const handleCellDoubleClick = event => {
+  if (event.data.processResult === '차단') {
+    dialog.value = true
+  } else {
+    alert('이미 전송된 메일입니다.')
+  }
+}
 </script>
 
 <template>
@@ -138,6 +148,30 @@ const handleCellDoubleClick = event => {}
       </VSheet>
     </VCol>
   </VRow>
+  <VDialog
+    v-model="dialog"
+    width="auto"
+  >
+    <VCard
+      max-width="400"
+      prepend-icon="mdi-update"
+      text="메일의 상세 정보를 확인할 수 있습니다."
+      title="메일 상세"
+    >
+      <template #actions>
+        <VBtn
+          class="ms-auto"
+          color="error"
+          text="차단"
+          @click="dialog = false"
+        ></VBtn>
+        <VBtn
+          text="전송"
+          @click="dialog = false"
+        ></VBtn>
+      </template>
+    </VCard>
+  </VDialog>
 </template>
 
 <style>
